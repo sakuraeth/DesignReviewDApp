@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Review DApp Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<section id="upload-designs">
+    <h2>Upload Design</h2>
+    <form action="/upload-design" method="POST" enctype="multipart/form-data">
+        <label for="design-title">Design Title:</label>
+        <input type="text" id="design-title" name="design_title" required>
+        
+        <label for="design-description">Design Description:</label>
+        <textarea id="design-description" name="design_description" required></textarea>
+        
+        <label for="design-file">Design File:</label>
+        <input type="file" id="design-file" name="design_file" required>
+        
+        <button type="submit">Upload Design</button>
+    </form>
+</section>
+<section id="view-designs">
+    <h2>View Designs</h2>
+    <div id="designs-container">
+    </div>
+</section>
+<section id="leave-review">
+    <h2>Leave a Review</h2>
+    <form action="/submit-review" method="POST">
+        <label for="design-id">Design ID:</label>
+        <input type="text" id="design-id" name="design_id" required>
+        
+        <label for="reviewer-name">Your Name:</label>
+        <input type="text" id="reviewer-name" name="reviewer_name" required>
+        
+        <label for="review-text">Your Review:</label>
+        <textarea id="review-text" name="review_text" required></textarea>
+        
+        <button type="submit">Submit Review</button>
+    </form>
+</section>
+<script src="app.js"></script>
+</body>
+</html>
