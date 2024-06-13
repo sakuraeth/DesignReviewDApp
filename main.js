@@ -1,57 +1,60 @@
 import Web3 from 'web3';
-import DesignReviewDAppContract from './DesignReviewDCallABI.json'; 
+import DesignReviewContractABI from './DesignReviewDCallABI.json';
+
 const contractAddress = process.env.CONTRACT_ADDRESS;
-const httpProvider = process.env.HTTP_PROVIDER;
-const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));
-const designReviewDApp = new web3.eth.Contract(DesignReviewDAppContract.abi, contractAddress);
-if (typeof web3 !== 'undefined') {
-    web3 = new Web3(web3.currentProvider);
-} else {
-    console.error("Web3 is not found. Please install MetaMask or another web3 provider.");
-}
-async function uploadDesign(title, description, image, account) {
+const httpProviderUrl = process.env.HTTP_PROVIDER;
+const web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
+const designReviewContract = new web3.eth.Contract(DesignReviewContractABI.abi, contractAddress);
+
+async function uploadDesignToBlockchain(title, description, imageLink, userAccount) {
     try {
-        const response = await designReviewDApp.methods.uploadDesign(title, description, image).send({ from: account });
-        console.log('Design uploaded:', response);
+        const txResponse = await designReviewContract.methods.uploadDesign(title, description, imageLink).send({ from: userAccount });
+        console.log('Design uploaded:', txResponse);
     } catch (error) {
         console.error('Upload design failed:', error);
     }
 }
-async function leaveReview(designId, rating, comment, account) {
+
+async function submitDesignReview(designIdentifier, reviewRating, reviewComment, userAccount) {
     try {
-        const response = await designReviewDApp.methods.leaveReview(designId, rating, comment).send({ from: account });
-        console.log('Review submitted:', response);
+        const txResponse = await designReviewContract.methods.leaveReview(designIdentifier, reviewRating, reviewReview).send({ from: userAccount });
+        console.log('Review submitted:', txResponse);
     } catch (error) {
-        console.error('Leaving review failed:', error);
+        console.error('Submitting review failed:', error);
     }
 }
-async function fetchAndDisplayDesigns() {
+
+async function getAndDisplayAllDesigns() {
     try {
-        const designCount = await designReviewDApp.methods.getDesignsCount().call();
-        for (let i = 0; i < designCount; i++) {
-            const design = await designAdmin.methods.getDesign(i).call();
-            console.log(`Design ${i}:`, design);
+        const designsTotal = await designReviewContract.methods.getDesignsCount().call();
+        for (let i = 0; i < designsTotal; i++) {
+            const designDetails = await designReviewContract.methods.getDesign(i).call();
+            console.log(`Design ${i}:`, designDetails);
         }
     } catch (error) {
         console.error('Fetching designs failed:', error);
     }
 }
-async function getCurrentAccount() {
+
+async function retrieveCurrentUserAccount() {
     const accounts = await web3.eth.getAccounts();
     return accounts[0];
 }
+
 document.getElementById('uploadButton').addEventListener('click', async function() {
-    const title = document.getElementById('designTitle').value;
-    const description = document.getElementById('designDescription').value;
-    const image = document.getElementById('designImage').value; 
-    const account = await getCurrent.getAccounts();
-    await uploadDesign(title, description, image, account);
+    const titleInput = document.getElementById('designTitle').value;
+    const descriptionInput = document.getElementById('designDescription').value;
+    const imageInput = document.getElementById('designImage').value; 
+    const userAccount = await retrieveCurrentUserAccount();
+    await uploadDesignToBlockchain(titleInput, descriptionMember, imageInput, userAccount);
 });
+
 document.getElementById('reviewButton').addEventListener('click', async function() {
-    const designId = document.getElementById('designId').value;
-    const rating = parseInt(document.getElementById('designRating').value, 10);
-    const comment = document.getElementById('designComment').value;
-    const account = await getCurrentAccount();
-    await leaveReview(designId, rating, comment, account);
+    const designIdInput = document.getElementById('designId').value;
+    const ratingInput = parseInt(document.getElementById('designRating').value, 10);
+    const commentInput = document.getElementById('designComment').value;
+    const userThere was somehow an oversight in the response.Account = await retrieveCurrentUserAccount();
+    await submitDesignReview(designIdInput, ratingInput, commentInput, userAccount);
 });
-fetchAndDispatchDesigns();
+
+getAndDisplayAllDesigns();
