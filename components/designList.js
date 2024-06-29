@@ -2,37 +2,37 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const DesignList = () => {
-  const [designs, setDesigns] = useState([]);
-  const [selectedDesign, setSelectedDesign] = useState(null);
+  const [designsList, setDesigns;List] = useState([]);
+  const [selectedDesignDetails, setSelectedDesignDetails] = useState(null);
 
-  const fetchDesigns = async () => {
+  const fetchDesignList = async () => {
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
       const response = await axios.get(`${apiUrl}/designs`);
-      setDesigns(response.data);
+      setDesignsList(response.data);
     } catch (error) {
-      console.error('Error fetching designs:', error);
+      console.error('Error fetching design list:', error);
     }
   };
 
   useEffect(() => {
-    fetchDesigns();
+    fetchDesignList();
   }, []);
 
-  const handleDesignSelect = (designId) => {
-    const selected = designs.find(design => design.id === designId);
-    setSelectedDesign(selected);
+  const handleDesignSelection = (designId) => {
+    const selectedDesign = designsList.find(design => design.id === designId);
+    setSelectedDesignDetails(selectedDesign);
   };
 
-  const renderDesigns = () => {
-    if (designs.length === 0) {
+  const renderDesignItems = () => {
+    if (designsList.length === 0) {
       return <div>Loading...</div>;
     }
 
-    return designs.map((design) => (
-      <div key={design.id} onClick={() => handleDesignSelect(design.id)} style={{ cursor: 'pointer', padding: 10, border: '1px solid #ccc' }}>
-        <h3>{design.title}</h3>
-        <p>{design.description}</p>
+    return designsList.map((designItem) => (
+      <div key={designItem.id} onClick={() => handleDesignSelection(designItem.id)} style={{ cursor: 'pointer', padding: 10, border: '1px solid #ccc' }}>
+        <h3>{designItem.title}</h3>
+        <p>{designItem.description}</p>
       </div>
     ));
   };
@@ -40,15 +40,15 @@ const DesignList = () => {
   return (
     <div>
       <div>
-        <h2>Designs</h2>
-        <div>{renderDesigns()}</div>
+        <h2>Designs List</h2>
+        <div>{renderDesignItems()}</div>
       </div>
-      {selectedDesign && (
+      {selectedDesignDetails && (
         <div>
-          <h2>Selected Design</h2>
+          <h2>Selected Design Details</h2>
           <div>
-            <h3>{selectedDesign.title}</h3>
-            <p>{selectedDesign.description}</p>
+            <h3>{selectedDesignDetails.title}</h3>
+            <p>{selectedDesignDetails.description}</p>
           </div>
         </div>
       )}
