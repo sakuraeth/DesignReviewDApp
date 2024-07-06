@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, * as react from 'react';
 import axios from 'axios';
+
+const { useState, useEffect } = react;
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -7,7 +9,7 @@ const DesignDetailsComponent = ({ designId }) => {
   const [designDetails, setDesignDetails] = useState(null);
   const [reviews, setReviews] = useState([]);
 
-  useEffect(() => {
+  useEffect(() {
     const fetchDesignDetails = async () => {
       try {
         const response = await axios.get(`${API_URL}/designs/${designId}`);
