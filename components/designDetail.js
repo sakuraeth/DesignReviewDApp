@@ -1,30 +1,43 @@
-import React, * as react from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-const { useState, useEffect } = react;
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 const DesignDetailsComponent = ({ designId }) => {
   const [designDetails, setDesignDetails] = useState(null);
   const [reviews, setReviews] = useState([]);
+  // Adding state for loading and error states
+  const [isFetchingDesign, setIsFetchingDesign] = useState(false);
+  const [designError, setDesignError] = useState(null);
+  const [isFetchingReviews, setIsFetchingReviews] = useState(false);
+  const [reviewsError, setReviewsError] = useState(null);
 
-  useEffect(() {
+  useEffect(() => {
     const fetchDesignDetails = async () => {
+      setIsFetchingDesign(true); // Start fetching design details
       try {
         const response = await axios.get(`${API_URL}/designs/${designId}`);
         setDesignDetails(response.data);
+        setDesignError(null); // Clear any previous errors
       } catch (error) {
         console.error('Error fetching design details:', error);
+        setDesignError('Failed to fetch design details'); // Set error message
+      } finally {
+        setIsFetchingDesign(false); // Finished fetching
       }
     };
 
     const fetchReviews = async () => {
+      setIsFetchingReviews(true); // Start fetching reviews
       try {
         const response = await axios.get(`${API_URL}/reviews?designId=${designId}`);
         setReviews(response.data);
+        setReviewsError(null); // Clear any previous errors
       } catch (error) {
         console.error('Error fetching reviews:', error);
+        setReviewsError('Failed to fetch reviews'); // Set error message
+      } finally {
+        setIsFetchingReviews(false); // Finished fetching
       }
     };
 
@@ -34,14 +47,22 @@ const DesignDetailsComponent = ({ designId }) => {
 
   return (
     <div>
-      {designDetails ? (
+      {isFetchingDesign ? (
+        <p>Loading design details...</p>
+      ) : designError ? (
+        <p>Error: {designError}</p>
+      ) : designDetails ? (
         <div>
           <h2>{designDetails.title}</h2>
           <p>{designDetails.description}</p>
           <img src={designDetails.imageURL} alt={designDetails.title} />
           <div>
             <h3>Reviews</h3>
-            {reviews.length > 0 ? (
+            {isFetchingReviews ? (
+              <p>Loading reviews...</p>
+            ) : reviewsError ? (
+              <p>Error: {reviewsError}</p>
+            ) : reviews.length > 0 ? (
               reviews.map(review => (
                 <div key={review.id}>
                   <h4>{review.author}</h4>
@@ -54,7 +75,7 @@ const DesignDetailsComponent = ({ designId }) => {
           </div>
         </div>
       ) : (
-        <p>Loading design details...</p>
+        <p>Design details unavailable.</p>
       )}
     </div>
   );
