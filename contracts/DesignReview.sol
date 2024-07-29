@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 contract DesignReviewDApp {
@@ -32,6 +33,7 @@ contract DesignReviewDApp {
 
     function postReview(uint256 designId, string memory reviewText) external {
         require(designId > 0 && designId <= totalDesigns, "Design does not exist.");
+
         designReviews[designId].push(Review(designId, msg.sender, reviewText));
         emit ReviewAdded(designId, msg.sender, reviewText);
     }
