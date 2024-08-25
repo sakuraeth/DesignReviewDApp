@@ -33,4 +33,12 @@ contract("DesignReview", (accounts) => {
             return ev.designId.toString() === "0" && ev.voter === user2;
         }, "DesignVoted event should be emitted with correct parameters.");
     });
+
+    it('should allow a user to update a design', async () => {
+        await designReviewInstance.uploadDesign("Design 1", "URL1", { from: user1 });
+        const tx = await designReviewInstance.updateDesign(0, "Updated Design 1", "UpdatedURL1", { from: user1 });
+        truffleAssert.eventEmitted(tx, 'DesignUpdated', (ev) => {
+            return ev.designId.toString() === "0" && ev.uploader === user1 && ev.newName === "Updated Design 1" && ev.newUrl === "UpdatedURL1";
+        }, "DesignUpdated event should be emitted with correct parameters.");
+    });
 });
