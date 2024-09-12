@@ -4,66 +4,51 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_API_URL;
 
 const DesignDetailsComponent = ({ designId }) => {
-  const [designDetails, setDesignDetails] = useState(null);
-  const [reviews, setReviews] = useState([]);
-  // Adding state for loading and error states
-  const [isFetchingDesign, setIsFetchingDesign] = useState(false);
-  const [designError, setDesignError] = useState(null);
-  const [isFetchingReviews, setIsFetchingReviews] = useState(false);
-  const [reviewsError, setReviewsError] = useState(null);
+  const [designData, setDesignData] = useState({ details: null, reviews: [] });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchDesignDetails = async () => {
-      setIsFetchingDesign(true); // Start fetching design details
+    const fetchData = async () => {
+      setIsLoading(true); // Start fetching
       try {
-        const response = await axios.get(`${API_URL}/designs/${designId}`);
-        setDesignDetails(response.data);
-        setDesignError(null); // Clear any previous errors
+        // Assuming the API endpoint now returns both design details and reviews in a single call
+        const response = await axios.get(`${API_URL}/designDetailsAndReviews/${designId}`);
+        setDesignData({
+          details: response.data.designDetails,
+          reviews: response.data.reviews,
+        });
+        setError(null); // Clear any previous errors
       } catch (error) {
-        console.error('Error fetching design details:', error);
-        setDesignError('Failed to fetch design details'); // Set error message
+        console.error('Error fetching data:', error);
+        setError('Failed to fetch data'); // Set error message
       } finally {
-        setIsFetchingDesign(false); // Finished fetching
+        setIsLoading(false); // Finished fetching
       }
     };
 
-    const fetchReviews = async () => {
-      setIsFetchingReviews(true); // Start fetching reviews
-      try {
-        const response = await axios.get(`${API_URL}/reviews?designId=${designId}`);
-        setReviews(response.data);
-        setReviewsError(null); // Clear any previous errors
-      } catch (error) {
-        console.error('Error fetching reviews:', error);
-        setReviewsError('Failed to fetch reviews'); // Set error message
-      } finally {
-        setIsFetchingReviews(false); // Finished fetching
-      }
-    };
-
-    fetchDesignDetails();
-    fetchReviews();
+    fetchData();
   }, [designId]);
 
   return (
     <div>
-      {isFetchingDesign ? (
-        <p>Loading design details...</p>
-      ) : designError ? (
-        <p>Error: {designError}</p>
-      ) : designDetails ? (
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>Error: {error}</p>
+      ) : (
         <div>
-          <h2>{designDetails.title}</h2>
-          <p>{designDetails.description}</p>
-          <img src={designDetails.imageURL} alt={designDetails.title} />
+          {designData.details && (
+            <div>
+              <h2>{designData.details.title}</h2>
+              <p>{designData.details.description}</p>
+              <img src={designData.details.imageURL} alt={designData.details.title} />
+            </div>
+          )}
           <div>
             <h3>Reviews</h3>
-            {isFetchingReviews ? (
-              <p>Loading reviews...</p>
-            ) : reviewsError ? (
-              <p>Error: {reviewsError}</p>
-            ) : reviews.length > 0 ? (
-              reviews.map(review => (
+            {designData.reviews.length > 0 ? (
+              designData.reviews.map(review => (
                 <div key={review.id}>
                   <h4>{review.author}</h4>
                   <p>{review.content}</p>
@@ -74,8 +59,6 @@ const DesignDetailsComponent = ({ designId }) => {
             )}
           </div>
         </div>
-      ) : (
-        <p>Design details unavailable.</p>
       )}
     </div>
   );
